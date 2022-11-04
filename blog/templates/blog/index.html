@@ -1,11 +1,15 @@
-<h1>Hello, world.</h1>
+<h1>トップページ</h1>
 <div>
     {% if user.is_authenticated %}
         {{ user.username }} さん
         <h2>投稿された記事一覧</h2>
-            {% for article in articles %}
-                <div>{{ article.title }}</div>
-            {% endfor %}
+        {% for article in articles %}
+        <div>
+            <a href="/blog/articles/{{ article.id }}">
+                {{ article.title }}
+            </a>
+        </div>
+    {% endfor %}
         <div>
             <a href="/blog/mypage">マイページ</a>
         </div>

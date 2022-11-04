@@ -79,3 +79,12 @@ def index(request):
     return render(request, "blog/index.html", {
         "articles": articles
     })
+
+class ArticleView(View):
+    # urls.py の <id> が、 id に入る
+    def get(self, request, id):
+        # get は条件に合致した記事を一つ取得する
+        article = Article.objects.get(id=id)
+        return render(request, "blog/article.html", {
+            "article": article,
+        })
