@@ -88,3 +88,12 @@ class ArticleView(View):
         return render(request, "blog/article.html", {
             "article": article,
         })
+
+class MypageView(LoginRequiredMixin, View): 
+    login_url = '/blog/login'
+
+    def get(self, request):
+        articles = Article.objects.filter(user=request.user)
+        return render(request, "blog/mypage.html", {
+            "articles": articles
+        })

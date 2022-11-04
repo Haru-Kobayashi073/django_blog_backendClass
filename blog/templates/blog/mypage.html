@@ -6,6 +6,14 @@
 <body>
     <h1>マイページ</h1>
     <div>ユーザー名: {{ user.username }}</div>
+    <h2>記事一覧</h2>
+    {% for article in articles %}
+        <div>
+            <a href="/blog/articles/{{ article.id}}">
+                {{ article.title}}
+            </a>
+        </div>
+        {% endfor %}
     <div>
         <a href="/blog/logout">ログアウト</a>
     </div>
