@@ -2,10 +2,26 @@
 <div>
     {% if user.is_authenticated %}
         {{ user.username }} さん
+        <h2>投稿された記事一覧</h2>
+            {% for article in articles %}
+                <div>{{ article.title }}</div>
+            {% endfor %}
+        <div>
+            <a href="/blog/mypage">マイページ</a>
+        </div>
+        <div>
+            <a href="/blog/logout">ログアウト</a>
+        </div>
     {% else %}
         ログインしていません
+        <div>
+            <a href="/blog/register">アカウント登録</a>
+        </div>
+        <div>
+            <a href="/blog/login">ログイン</a>
+        </div>
     {% endif %}
 </div>
 <div>
-    <a href="/blog/detail/">detail</a>
+    <a href="/blog/detail">detail</a>
 </div>

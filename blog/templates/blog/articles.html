@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>記事一覧</title>
+</head>
+
+<body>
+    <h1>記事一覧</h1>
+    {% for article in articles %}
+        <div>{{ article.title }}</div>
+    {% endfor %}
+</body>
+</html>
