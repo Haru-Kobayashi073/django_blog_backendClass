@@ -2,7 +2,7 @@
 <div>
     {% if user.is_authenticated %}
         {{ user.username }} さん
-        <h2>投稿された記事一覧</h2>
+        <h2><投稿された記事一覧></h2>
         {% for article in articles %}
         <div>
             <a href="/blog/articles/{{ article.id }}">
@@ -11,6 +11,7 @@
         </div>
     {% endfor %}
         <div>
+            <br>
             <a href="/blog/mypage">マイページ</a>
         </div>
         <div>
