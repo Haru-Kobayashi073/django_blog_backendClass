@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from blog.models import Article
+from blog.qiita import QiitaApiClient
 
 
 def index(request):
@@ -69,16 +70,21 @@ class ArticleListView(View):
         return render(request, "blog/articles.html", {
             "articles": articles
         })
+
 def index(request):
     # Article の model を使ってすべての記事を取得する
     # Article.objects.all() は article のリストが返ってくる
     articles = Article.objects.all()
-
+    # qiita API へのリクエスト処理を追加
+    qiita_api = QiitaApiClient()
+    qiita_api.get_django_articles()
+    
     # こうすることで、article 変数をテンプレートにわたす事ができる
     # {テンプレート上での変数名: 渡す変数}
     return render(request, "blog/index.html", {
         "articles": articles
     })
+    
 
 class ArticleView(View):
     # urls.py の <id> が、 id に入る
