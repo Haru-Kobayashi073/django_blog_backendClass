@@ -2,6 +2,25 @@
 <div>
     {% if user.is_authenticated %}
         {{ user.username }} さん
+        <div>
+            <br>
+            <a href="/blog/mypage">マイページ</a>
+        </div>
+        <div>
+            <a href="/blog/logout">ログアウト</a>
+        </div>
+        <div>
+            <a href="/blog/detail">detail</a>
+        </div>
+        {% else %}
+        ログインしていません
+        <div>
+            <a href="/blog/register">アカウント登録</a>
+        </div>
+        <div>
+            <a href="/blog/login">ログイン</a>
+        </div>
+        {% endif %}
         <h2><投稿された記事一覧></h2>
         {% for article in articles %}
         <div>
@@ -10,23 +29,12 @@
             </a>
         </div>
     {% endfor %}
+    <h2>Qiitaの記事一覧</h2>
+        {% for qiita_article in qiita_articles %}
         <div>
-            <br>
-            <a href="/blog/mypage">マイページ</a>
+            <a href="{{ qiita_article.url }}">
+                {{ qiita_article.title }}
+            </a>
         </div>
-        <div>
-            <a href="/blog/logout">ログアウト</a>
-        </div>
-    {% else %}
-        ログインしていません
-        <div>
-            <a href="/blog/register">アカウント登録</a>
-        </div>
-        <div>
-            <a href="/blog/login">ログイン</a>
-        </div>
-    {% endif %}
-</div>
-<div>
-    <a href="/blog/detail">detail</a>
+{% endfor %}
 </div>

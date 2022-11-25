@@ -77,12 +77,13 @@ def index(request):
     articles = Article.objects.all()
     # qiita API へのリクエスト処理を追加
     qiita_api = QiitaApiClient()
-    qiita_api.get_django_articles()
+    qiita_articles = qiita_api.get_django_articles()
     
     # こうすることで、article 変数をテンプレートにわたす事ができる
     # {テンプレート上での変数名: 渡す変数}
     return render(request, "blog/index.html", {
-        "articles": articles
+        "articles": articles,
+        "qiita_articles": qiita_articles,
     })
     
 
