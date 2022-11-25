@@ -7,7 +7,7 @@ class QiitaApiClient:
         # get リクエストを送る
         response = requests.get(
             "https://qiita.com/api/v2/tags/django/items",
-            headers={"Authorization": "Bearer 51ab5758e906067b2a5ef6e7824b7fb969544e81"},
+            headers={"Authorization": "Bearer "},
         )
         
         # アクセストークンがない場合はこう
