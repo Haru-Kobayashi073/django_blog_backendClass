@@ -9,3 +9,18 @@ class Article(models.Model):
     body = models.TextField()
     # 記事を書いた人
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+class Comment(models.Model):
+    """記事に対するコメントの Database Model"""
+
+    # コメント本文
+    body = models.TextField()
+
+    # コメントを付けた記事
+    # 記事が消えたらコメントも消える（CASCADE）
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comments")
+
+    # コメントを書いた人
+    # ユーザーが消えたらコメントも消える（CASCADE）
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
