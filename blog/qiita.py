@@ -7,7 +7,7 @@ class QiitaApiClient:
         # get リクエストを送る
         response = requests.get(
             "https://qiita.com/api/v2/tags/django/items",
-            headers={"Authorization": "Bearer 79da95fb9947d45fb07dfba64502c1cde81ae474"},
+            headers={"Authorization": "Bearer "},
         )
         if response.status_code != 200:
             raise RuntimeError("Qiitaの記事が取得できませんでした")

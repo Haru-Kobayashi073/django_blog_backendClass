@@ -6,14 +6,32 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from blog.models import Article
 from blog.qiita import QiitaApiClient
-
-
-def index(request):
-  return HttpResponse("Hello world.")
+from django.http import JsonResponse
+import json
 
 def index(request):
-    return render(request, "blog/index.html")
-
+    # Article の model を使ってすべての記事を取得する
+    # Article.objects.all() は article のリストが返ってくる
+    articles = Article.objects.all()
+    # qiita API へのリクエスト処理を追加
+    qiita_api = QiitaApiClient()
+    
+    # qiita の API がエラーになったかどうか表すフラグ
+    is_qiita_error = False
+    # 記事一覧を初期化しておく
+    qiita_articles = []
+    try:
+        qiita_articles = qiita_api.get_django_articles()
+    except RuntimeError:
+        is_qiita_error = True
+    
+    # こうすることで、article 変数をテンプレートにわたす事ができる
+    # {テンプレート上での変数名: 渡す変数}
+    return render(request, "blog/index.html", {
+        "articles": articles,
+        "is_qiita_error": is_qiita_error,
+        "qiita_articles": qiita_articles,
+    })
 def detail(request):
     return HttpResponse("detail page")
 class AccountCreateView(View):
@@ -32,11 +50,16 @@ class AccountLoginView(LoginView):
     def get_default_redirect_url(self):
         """ログインに成功した時に飛ばされるURL"""
         return "/blog"
-class MypageView(LoginRequiredMixin, View):
-    # ログインしていない場合に飛ばすページの設定
+
+class MypageView(LoginRequiredMixin, View): 
     login_url = '/blog/login'
+    # ログインしていない場合に飛ばすページの設定
+
     def get(self, request):
-        return render(request, "blog/mypage.html")
+        articles = Article.objects.filter(user=request.user)
+        return render(request, "blog/mypage.html", {
+            "articles": articles
+        })
 class AccountLogoutView(LogoutView):
     template_name = 'blog/logout.html'
 class ArticleCreateView(LoginRequiredMixin, View):
@@ -71,29 +94,6 @@ class ArticleListView(View):
             "articles": articles
         })
 
-def index(request):
-    # Article の model を使ってすべての記事を取得する
-    # Article.objects.all() は article のリストが返ってくる
-    articles = Article.objects.all()
-    # qiita API へのリクエスト処理を追加
-    qiita_api = QiitaApiClient()
-    
-    # qiita の API がエラーになったかどうか表すフラグ
-    is_qiita_error = False
-    # 記事一覧を初期化しておく
-    qiita_articles = []
-    try:
-        qiita_articles = qiita_api.get_django_articles()
-    except RuntimeError:
-        is_qiita_error = True
-    
-    # こうすることで、article 変数をテンプレートにわたす事ができる
-    # {テンプレート上での変数名: 渡す変数}
-    return render(request, "blog/index.html", {
-        "articles": articles,
-        "is_qiita_error": is_qiita_error,
-        "qiita_articles": qiita_articles,
-    })
     
 
 class ArticleView(View):
@@ -105,11 +105,43 @@ class ArticleView(View):
             "article": article,
         })
 
-class MypageView(LoginRequiredMixin, View): 
-    login_url = '/blog/login'
-
+        
+class ArticleApiView(View):
+    
     def get(self, request):
-        articles = Article.objects.filter(user=request.user)
-        return render(request, "blog/mypage.html", {
-            "articles": articles
+        # DB から Article を取得
+        # articles は blog.models.Article のリス
+        articles = Article.objects.all()
+
+        # Article オブジェクトのリストを、dict の list に変換
+        dict_articles = []
+        for article in articles:
+            dict_article = {
+                "id": article.id,
+                "title": article.title,
+                "body": article.body,
+            }
+            dict_articles.append(dict_article)
+
+        json = {
+            "articles": dict_articles,
+        }
+        return JsonResponse(json)
+    
+    def post(self, request):
+        # リクエストボディに入っている JSON 形式の文字列を
+        # list や dict に変換してくれる
+        json_dict = json.loads(request.body)
+
+        # 保存は今まで通り
+        article = Article(
+            title=json_dict["title"],
+            body=json_dict["body"],
+            # user には、現在ログイン中のユーザーをセットする
+            user=request.user,
+        )
+        article.save()
+
+        return JsonResponse({
+            "message": "記事の投稿に成功しました"
         })
