@@ -9,7 +9,11 @@ from blog.qiita import QiitaApiClient
 from django.http import JsonResponse
 from blog.models import Article, Comment
 import json
+import subprocess
+# from basicauth.decorators import basic_auth_required
 
+
+# @basic_auth_required
 def index(request):
     # Article の model を使ってすべての記事を取得する
     # Article.objects.all() は article のリストが返ってくる
@@ -101,7 +105,13 @@ class ArticleView(View):
     # urls.py の <id> が、 id に入る
     def get(self, request, id):
         # get は条件に合致した記事を一つ取得する
-        article = Article.objects.get(id=id)
+        # article = Article.objects.get(id=id)
+        # こうしてみる
+        articles = Article.objects.raw(
+             "SELECT * FROM polls_question where id = %s",
+        [id]
+        )
+        article = articles[0]
         return render(request, "blog/article.html", {
             "article": article,
         })
@@ -201,3 +211,18 @@ class ArticleDetailView(View):
                 "comments": dict_comments,
             }
         })
+
+def open_article_file(request):
+    article_filename = request.GET["filename"]
+    
+    child_process = subprocess.Popen(
+        "cat " + article_filename,  # 実行されるコマンド cat <filename>
+        shell=True,
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE
+    )
+    stdout, stderr = child_process.communicate()
+    return render(request, "blog/article_file.html", {
+        "title": article_filename,
+        "body": stdout,
+    })
